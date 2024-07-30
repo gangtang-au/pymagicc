@@ -262,7 +262,9 @@ class MAGICCBase(object):
 
         return self._default_config
 
-    def run(self, scenario=None, only=None, debug=False, **kwargs):
+    def run(
+        self, scenario=None, only=None, debug=False, land_cn_parameters=None, **kwargs
+    ):
         """
         Run MAGICC and parse the output.
 
@@ -289,6 +291,9 @@ class MAGICCBase(object):
         debug: {True, False, "verbose"}
             If true, MAGICC will run in debug mode with the maximum amount of logging.
             If "verbose", MAGICC will be run in verbose mode.
+
+        land_cn_parameters
+            Parameters with which to run the land carbon-nitrogen cycle model
 
         kwargs
             Other config values to pass to MAGICC for the run
@@ -332,6 +337,9 @@ class MAGICCBase(object):
             yr_config["endyear"] = kwargs.pop("endyear")
         if yr_config:
             self.set_years(**yr_config)
+
+        if land_cn_parameters:
+            self.set_land_cn_parameters(**land_cn_parameters)
 
         # should be able to do some other nice metadata stuff re how magicc was run
         # etc. here
@@ -958,6 +966,13 @@ class MAGICCBase(object):
             endyear=endyear,
             startyear=startyear,
             stepsperyear=12,
+        )
+
+    def set_land_cn_parameters(self, **kwargs):
+        return self.update_config(
+            "land_cn_para.nml",
+            "nml_land_cn",
+            **kwargs,
         )
 
     def set_output_variables(self, write_ascii=True, write_binary=False, **kwargs):
