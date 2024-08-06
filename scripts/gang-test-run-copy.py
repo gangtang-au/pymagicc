@@ -31,8 +31,9 @@ def main() -> None:
     # with pymagicc.MAGICC7(root_dir=ROOT_DIR_MAGICC_REPO) as magicc:
     with pymagicc.MAGICC7() as magicc:
         res_l = []
-        for cflxnpp0, cplsp0 in zip([40.0, 60.0], [200.0, 400.0]):
+        for n_switch in [0, 1]:
             res_run = magicc.run(
+                co2_switchfromconc2emis_year=1850,
                 scenario=scenario,
                 out_dynamic_vars=[
                     "DAT_SURFACE_TEMP",
@@ -40,24 +41,27 @@ def main() -> None:
                     "DAT_CO2_LAND_POOL",
                     "DAT_CO2_NETATMOSLANDCO2FLUX",
                 ],
-                startyear=1750,
-                endyear=2105,
-                land_cn_parameters=dict(cplsp0=cplsp0, cflxnpp0=cflxnpp0)
+                startyear=1850,
+                endyear=2100,
+                land_cn_parameters=dict(n_switch=n_switch, t0=1850),
+            )
                 # TOOD: add variable handling
                 # TODO: add argument passing
-            )
-            res_run["cplsp0"] = cplsp0
-            res_run["cflxnpp0"] = cflxnpp0
+
+            # res_run["cplsp0"] = cplsp0
+            res_run["n_switch"] = n_switch
 
             res_l.append(res_run)
             # breakpoint()
 
     res = scmdata.run_append(res_l)
-    for vrun in res.filter(region="World").groupby("variable"):
-        fig, ax = plt.subplots()
-        vrun.lineplot(hue="cflxnpp0", style="variable", ax=ax)
+    plt.rcParams['legend.fontsize'] = 8
+    plt.rcParams['xtick.labelsize'] = 6
+    plt.rcParams['ytick.labelsize'] = 6
+    fig, axs = plt.subplots(1, 4)
+    for vrun, ax in zip(res.filter(region="World").groupby("variable"), axs):
+        vrun.lineplot(hue="n_switch", style="variable", ax=ax)
 
-    plt.tight_layout()
     plt.show()
 
 

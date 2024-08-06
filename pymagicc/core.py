@@ -971,7 +971,7 @@ class MAGICCBase(object):
     def set_land_cn_parameters(self, **kwargs):
         return self.update_config(
             "land_cn_para.nml",
-            "nml_land_cn",
+            "nml_land_cn_para",
             **kwargs,
         )
 
